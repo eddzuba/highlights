@@ -27,8 +27,6 @@
       --badge-text: #60a5fa;
       --tag-bg: #272733;
       --tag-text: #d1d5db;
-      --active-card-bg: rgba(59, 130, 246, 0.1);
-      --active-card-border: #3b82f6;
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
@@ -55,7 +53,7 @@
 
     /* Container */
     .app-container {
-      max-width: 840px;
+      max-width: 680px;
       margin: 0 auto;
       width: 100%;
       padding: 12px 14px 40px;
@@ -230,7 +228,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 14px;
+      padding: 12px 14px;
       background: var(--card-bg);
       border-top: 1px solid var(--card-border);
       font-size: 0.85rem;
@@ -243,20 +241,32 @@
       align-items: center;
       gap: 8px;
       font-weight: 600;
+      flex-wrap: wrap;
     }
 
     .rally-num-badge {
       background: var(--accent);
       color: #fff;
-      padding: 2px 8px;
+      padding: 3px 8px;
       border-radius: 6px;
       font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .rally-progress-badge {
+      background: #252530;
+      color: var(--text-main);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      border: 1px solid var(--card-border);
+      font-weight: 500;
     }
 
     .rally-score-badge {
       background: var(--tag-bg);
       color: #fbbf24;
-      padding: 2px 8px;
+      padding: 3px 8px;
       border-radius: 6px;
       font-size: 0.82rem;
       font-family: monospace;
@@ -267,6 +277,32 @@
       color: var(--text-muted);
       font-size: 0.8rem;
       font-variant-numeric: tabular-nums;
+    }
+
+    /* Player Chips */
+    .rally-players-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .player-tag {
+      font-size: 0.76rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+
+    .player-tag.highlighted {
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      color: var(--badge-text);
+      font-weight: 600;
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
     }
 
     /* Controls Bar */
@@ -394,187 +430,6 @@
       color: #fff;
       border-color: var(--accent);
       box-shadow: 0 2px 8px var(--accent-glow);
-    }
-
-    /* Rallies List Section */
-    .rallies-section {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .rallies-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 4px;
-    }
-
-    .rallies-title {
-      font-size: 1rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .rallies-counter {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-weight: 500;
-    }
-
-    .rallies-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    /* Rally Card */
-    .rally-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: 12px 14px;
-      cursor: pointer;
-      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      position: relative;
-    }
-
-    .rally-card:hover {
-      background: var(--card-hover);
-      border-color: #38384a;
-      transform: translateY(-1px);
-    }
-
-    .rally-card.active {
-      background: var(--active-card-bg);
-      border-color: var(--active-card-border);
-      box-shadow: 0 0 16px rgba(59, 130, 246, 0.2);
-    }
-
-    .rally-card.active::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 10px;
-      bottom: 10px;
-      width: 4px;
-      background: var(--accent);
-      border-radius: 0 4px 4px 0;
-    }
-
-    .rally-card-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .rally-card-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .card-rally-num {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .card-score {
-      background: #252530;
-      color: #fbbf24;
-      padding: 2px 7px;
-      border-radius: 5px;
-      font-family: monospace;
-      font-size: 0.82rem;
-      font-weight: 700;
-      border: 1px solid rgba(251, 191, 36, 0.2);
-    }
-
-    .card-time {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .playing-indicator {
-      display: none;
-      align-items: center;
-      gap: 3px;
-      height: 14px;
-    }
-
-    .rally-card.active .playing-indicator {
-      display: flex;
-    }
-
-    .playing-bar {
-      width: 3px;
-      height: 100%;
-      background: var(--accent);
-      border-radius: 2px;
-      animation: soundWave 0.8s ease infinite alternate;
-    }
-
-    .playing-bar:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .playing-bar:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes soundWave {
-      0% { height: 25%; }
-      100% { height: 100%; }
-    }
-
-    /* Player Chips inside card */
-    .rally-players-wrap {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .player-tag {
-      font-size: 0.76rem;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: var(--tag-bg);
-      color: var(--tag-text);
-      font-weight: 500;
-      transition: all 0.15s ease;
-    }
-
-    /* Highlighted player tag (current player) */
-    .player-tag.highlighted {
-      background: var(--badge-bg);
-      border: 1px solid var(--badge-border);
-      color: var(--badge-text);
-      font-weight: 600;
-      box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
-    }
-
-    /* Empty state */
-    .empty-state {
-      text-align: center;
-      padding: 36px 16px;
-      background: var(--card-bg);
-      border: 1px dashed var(--card-border);
-      border-radius: var(--radius-lg);
-      color: var(--text-muted);
-      font-size: 0.95rem;
     }
 
     /* Toast Notification */
@@ -712,6 +567,7 @@
       <div class="player-overlay-status">
         <div class="rally-current-meta">
           <span id="currentRallyBadge" class="rally-num-badge">Розыгрыш #1</span>
+          <span id="ralliesCountBadge" class="rally-progress-badge">1 из 1</span>
           <span id="currentScoreBadge" class="rally-score-badge">0:0</span>
           <span id="currentTimerBadge" class="rally-timer-badge">00:00 / 00:00</span>
         </div>
@@ -751,20 +607,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Rallies List Section -->
-    <section class="rallies-section">
-      <div class="rallies-header">
-        <h2 class="rallies-title">
-          <span>Список розыгрышей</span>
-        </h2>
-        <span id="ralliesCountBadge" class="rallies-counter">Загрузка...</span>
-      </div>
-
-      <div id="ralliesList" class="rallies-list">
-        <!-- Rallies will be rendered here dynamically -->
-      </div>
-    </section>
   </div>
 
   <!-- Toast Notification -->
@@ -793,8 +635,7 @@
       isPlaying: false,
       playbackRate: 1.0,
       pollTimer: null,
-      isTransitioning: false,
-      hasUserInteracted: false
+      isTransitioning: false
     };
 
     // DOM Elements
@@ -807,14 +648,13 @@
       currentScoreBadge: document.getElementById('currentScoreBadge'),
       currentTimerBadge: document.getElementById('currentTimerBadge'),
       currentParticipants: document.getElementById('currentParticipants'),
+      ralliesCountBadge: document.getElementById('ralliesCountBadge'),
       prevBtn: document.getElementById('prevBtn'),
       replayBtn: document.getElementById('replayBtn'),
       playPauseBtn: document.getElementById('playPauseBtn'),
       nextBtn: document.getElementById('nextBtn'),
       shareBtn: document.getElementById('shareBtn'),
       speedChips: document.querySelectorAll('.speed-chip'),
-      ralliesCountBadge: document.getElementById('ralliesCountBadge'),
-      ralliesList: document.getElementById('ralliesList'),
       toast: document.getElementById('toast'),
       playOverlay: document.getElementById('playOverlay')
     };
@@ -895,13 +735,8 @@
         await switchMatch(initialMatchId, false);
       } catch (err) {
         console.error('Ошибка загрузки matches/index.json:', err);
-        dom.ralliesCountBadge.textContent = 'Ошибка загрузки';
-        dom.ralliesList.innerHTML = `
-          <div class="empty-state">
-            Не удалось загрузить данные матчей.<br>
-            Убедитесь, что файлы matches/index.json доступны.
-          </div>
-        `;
+        dom.currentRallyBadge.textContent = 'Ошибка загрузки';
+        dom.ralliesCountBadge.textContent = '—';
       }
     }
 
@@ -932,7 +767,7 @@
       dom.matchSelect.value = matchId;
 
       try {
-        dom.ralliesCountBadge.textContent = 'Загрузка данных...';
+        dom.ralliesCountBadge.textContent = '...';
         const res = await fetch(`matches/${matchId}.json`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         state.matchData = await res.json();
@@ -952,11 +787,7 @@
         }
       } catch (err) {
         console.error(`Ошибка загрузки матча matches/${matchId}.json:`, err);
-        dom.ralliesList.innerHTML = `
-          <div class="empty-state">
-            Не удалось загрузить данные для матча ${matchId}.
-          </div>
-        `;
+        dom.currentRallyBadge.textContent = 'Ошибка загрузки';
       }
     }
 
@@ -1007,7 +838,7 @@
     }
 
     /**
-     * Filters rallies according to active tg_id, updates counter and re-renders cards
+     * Filters rallies according to active tg_id, updates counter and current rally display
      */
     function applyFilterAndRender() {
       if (!state.matchData || !Array.isArray(state.matchData.rallies)) {
@@ -1024,77 +855,7 @@
       }
 
       state.currentRallyIndex = 0;
-      updateRalliesCounter();
-      renderRalliesList();
       updatePlayerMetaDisplay();
-    }
-
-    function updateRalliesCounter() {
-      const total = state.matchData?.rallies?.length || 0;
-      const count = state.filteredRallies.length;
-      if (state.activeTgId) {
-        dom.ralliesCountBadge.textContent = `Розыгрышей: ${count} из ${total}`;
-      } else {
-        dom.ralliesCountBadge.textContent = `Розыгрышей: ${total}`;
-      }
-    }
-
-    /**
-     * Renders rally cards into DOM
-     */
-    function renderRalliesList() {
-      dom.ralliesList.innerHTML = '';
-
-      if (state.filteredRallies.length === 0) {
-        dom.ralliesList.innerHTML = `
-          <div class="empty-state">
-            В этом матче нет розыгрышей с участием выбранного игрока.
-          </div>
-        `;
-        return;
-      }
-
-      const playersMap = state.matchData?.players || {};
-
-      state.filteredRallies.forEach((rally, idx) => {
-        const card = document.createElement('div');
-        card.className = `rally-card ${idx === state.currentRallyIndex ? 'active' : ''}`;
-        card.dataset.index = idx;
-
-        const duration = Math.max(0, Math.round(rally.end - rally.start));
-        const timeFormatted = `${formatSeconds(rally.start)} – ${formatSeconds(rally.end)}`;
-
-        // Player chips
-        const playerChipsHtml = (rally.players || []).map(pId => {
-          const isHighlighted = state.activeTgId && String(pId) === String(state.activeTgId);
-          const pName = playersMap[pId] || `ID ${pId}`;
-          return `<span class="player-tag ${isHighlighted ? 'highlighted' : ''}">${escapeHtml(pName)}</span>`;
-        }).join('');
-
-        card.innerHTML = `
-          <div class="rally-card-top">
-            <div class="rally-card-left">
-              <span class="card-rally-num">#${rally.id || (idx + 1)}</span>
-              ${rally.score ? `<span class="card-score">${escapeHtml(rally.score)}</span>` : ''}
-              <span class="card-time">${timeFormatted} (${duration}с)</span>
-            </div>
-            <div class="playing-indicator" title="Воспроизводится">
-              <div class="playing-bar"></div>
-              <div class="playing-bar"></div>
-              <div class="playing-bar"></div>
-            </div>
-          </div>
-          <div class="rally-players-wrap">
-            ${playerChipsHtml}
-          </div>
-        `;
-
-        card.addEventListener('click', () => {
-          selectRallyByIndex(idx, true);
-        });
-
-        dom.ralliesList.appendChild(card);
-      });
     }
 
     /**
@@ -1105,17 +866,6 @@
     function selectRallyByIndex(idx, playImmediately = true) {
       if (idx < 0 || idx >= state.filteredRallies.length) return;
       state.currentRallyIndex = idx;
-
-      // Update card visual active classes
-      const cards = dom.ralliesList.querySelectorAll('.rally-card');
-      cards.forEach((c, i) => {
-        if (i === idx) {
-          c.classList.add('active');
-          c.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        } else {
-          c.classList.remove('active');
-        }
-      });
 
       updatePlayerMetaDisplay();
       syncUrlState();
@@ -1129,16 +879,20 @@
      * Updates header status under video player
      */
     function updatePlayerMetaDisplay() {
+      const total = state.filteredRallies.length;
       const rally = state.filteredRallies[state.currentRallyIndex];
-      if (!rally) {
+
+      if (!rally || total === 0) {
         dom.currentRallyBadge.textContent = 'Нет розыгрышей';
+        dom.ralliesCountBadge.textContent = '0 из 0';
         dom.currentScoreBadge.style.display = 'none';
         dom.currentTimerBadge.textContent = '';
-        dom.currentParticipants.innerHTML = '';
+        dom.currentParticipants.innerHTML = '<span style="color:var(--text-muted);font-size:0.8rem;">В этом матче нет розыгрышей с данным игроком</span>';
         return;
       }
 
       dom.currentRallyBadge.textContent = `Розыгрыш #${rally.id || (state.currentRallyIndex + 1)}`;
+      dom.ralliesCountBadge.textContent = `${state.currentRallyIndex + 1} из ${total}`;
 
       if (rally.score) {
         dom.currentScoreBadge.textContent = rally.score;
