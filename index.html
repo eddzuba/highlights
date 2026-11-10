@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Волейбольные хайлайты розыгрышей</title>
+  
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #0f0f12;
+      --card-bg: #1b1b22;
+      --card-hover: #23232c;
+      --card-border: #282834;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-glow: rgba(59, 130, 246, 0.35);
+      --accent-secondary: #ff4757;
+      --accent-secondary-glow: rgba(255, 71, 87, 0.25);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-sub: #6b7280;
+      --badge-bg: rgba(59, 130, 246, 0.15);
+      --badge-border: rgba(59, 130, 246, 0.4);
+      --badge-text: #60a5fa;
+      --tag-bg: #272733;
+      --tag-text: #d1d5db;
+      --active-card-bg: rgba(59, 130, 246, 0.1);
+      --active-card-border: #3b82f6;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --min-touch-target: 44px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.45;
+      overflow-x: hidden;
+    }
+
+    /* Container */
+    .app-container {
+      max-width: 840px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 12px 14px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 4px;
+    }
+
+    .brand-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .logo-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #3b82f6, #ff4757);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+    }
+
+    .app-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    .app-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .user-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .user-pill .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    }
+
+    /* Selectors Grid */
+    .filters-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .filters-bar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .select-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .custom-select-wrap {
+      position: relative;
+    }
+
+    .custom-select-wrap select {
+      width: 100%;
+      height: var(--min-touch-target);
+      background-color: var(--card-bg);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 0 38px 0 14px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .custom-select-wrap select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .custom-select-wrap::after {
+      content: "";
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Player Container (16:9) */
+    .player-card {
+      background: #000;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 Aspect Ratio */
+      background: #000;
+    }
+
+    #player {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .player-overlay-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--card-bg);
+      border-top: 1px solid var(--card-border);
+      font-size: 0.85rem;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .rally-current-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .rally-num-badge {
+      background: var(--accent);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+    }
+
+    .rally-score-badge {
+      background: var(--tag-bg);
+      color: #fbbf24;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-family: monospace;
+      font-weight: 700;
+    }
+
+    .rally-timer-badge {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Controls Bar */
+    .controls-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .transport-buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: var(--min-touch-target);
+      min-width: var(--min-touch-target);
+      padding: 0 16px;
+      background: #252530;
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+      gap: 6px;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn:hover {
+      background: #2e2e3b;
+      border-color: #3b3b4d;
+    }
+
+    .btn-icon {
+      padding: 0;
+      width: 48px;
+      height: var(--min-touch-target);
+      font-size: 1.1rem;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    .btn-share {
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      color: #60a5fa;
+      margin-left: auto;
+    }
+
+    .btn-share:hover {
+      background: rgba(59, 130, 246, 0.22);
+      border-color: rgba(59, 130, 246, 0.5);
+    }
+
+    /* Speed Selector Chips */
+    .speed-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .speed-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-right: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .speed-chip {
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 17px;
+      background: #252530;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .speed-chip:hover {
+      color: var(--text-main);
+      background: #2f2f3d;
+    }
+
+    .speed-chip.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+
+    /* Rallies List Section */
+    .rallies-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .rallies-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+    }
+
+    .rallies-title {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rallies-counter {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+
+    .rallies-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Rally Card */
+    .rally-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+    }
+
+    .rally-card:hover {
+      background: var(--card-hover);
+      border-color: #38384a;
+      transform: translateY(-1px);
+    }
+
+    .rally-card.active {
+      background: var(--active-card-bg);
+      border-color: var(--active-card-border);
+      box-shadow: 0 0 16px rgba(59, 130, 246, 0.2);
+    }
+
+    .rally-card.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 10px;
+      bottom: 10px;
+      width: 4px;
+      background: var(--accent);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .rally-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .rally-card-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-rally-num {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .card-score {
+      background: #252530;
+      color: #fbbf24;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border: 1px solid rgba(251, 191, 36, 0.2);
+    }
+
+    .card-time {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .playing-indicator {
+      display: none;
+      align-items: center;
+      gap: 3px;
+      height: 14px;
+    }
+
+    .rally-card.active .playing-indicator {
+      display: flex;
+    }
+
+    .playing-bar {
+      width: 3px;
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      animation: soundWave 0.8s ease infinite alternate;
+    }
+
+    .playing-bar:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .playing-bar:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes soundWave {
+      0% { height: 25%; }
+      100% { height: 100%; }
+    }
+
+    /* Player Chips inside card */
+    .rally-players-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .player-tag {
+      font-size: 0.76rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+
+    /* Highlighted player tag (current player) */
+    .player-tag.highlighted {
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      color: var(--badge-text);
+      font-weight: 600;
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 36px 16px;
+      background: var(--card-bg);
+      border: 1px dashed var(--card-border);
+      border-radius: var(--radius-lg);
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1f2937;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 30px;
+      border: 1px solid #374151;
+      font-size: 0.88rem;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Autoplay helper overlay */
+    .play-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      cursor: pointer;
+      gap: 12px;
+      backdrop-filter: blur(2px);
+    }
+
+    .play-overlay.show {
+      display: flex;
+    }
+
+    .play-big-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 0 24px var(--accent-glow);
+      transition: transform 0.15s ease;
+    }
+
+    .play-overlay:hover .play-big-btn {
+      transform: scale(1.08);
+    }
+
+    .play-hint-text {
+      font-size: 0.9rem;
+      color: #fff;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header>
+      <div class="brand-bar">
+        <div class="logo-block">
+          <div class="logo-icon">🏐</div>
+          <div>
+            <h1 class="app-title">Volleyball Highlights</h1>
+            <p class="app-subtitle">Персональный видеоплеер розыгрышей</p>
+          </div>
+        </div>
+
+        <div id="userPill" class="user-pill" style="display: none;">
+          <span class="status-dot"></span>
+          <span id="userNameDisplay">Игрок</span>
+        </div>
+      </div>
+
+      <!-- Match and Player Selectors -->
+      <div class="filters-bar">
+        <div class="select-group">
+          <label class="select-label" for="matchSelect">
+            <span>📅 Выбор матча</span>
+          </label>
+          <div class="custom-select-wrap">
+            <select id="matchSelect" aria-label="Выбор матча">
+              <option value="" disabled selected>Загрузка матчей...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="select-group">
+          <label class="select-label" for="playerSelect">
+            <span>👤 Фильтр игрока</span>
+          </label>
+          <div class="custom-select-wrap">
+            <select id="playerSelect" aria-label="Фильтр по игроку">
+              <option value="">Все игроки</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Player Container -->
+    <div class="player-card">
+      <div class="video-wrapper">
+        <div id="player"></div>
+        <div id="playOverlay" class="play-overlay">
+          <div class="play-big-btn">▶</div>
+          <div class="play-hint-text">Нажмите для воспроизведения розыгрыша</div>
+        </div>
+      </div>
+
+      <!-- Current Rally Meta info under video -->
+      <div class="player-overlay-status">
+        <div class="rally-current-meta">
+          <span id="currentRallyBadge" class="rally-num-badge">Розыгрыш #1</span>
+          <span id="currentScoreBadge" class="rally-score-badge">0:0</span>
+          <span id="currentTimerBadge" class="rally-timer-badge">00:00 / 00:00</span>
+        </div>
+        <div id="currentParticipants" class="rally-players-wrap"></div>
+      </div>
+    </div>
+
+    <!-- Controls Bar -->
+    <div class="controls-panel">
+      <div class="controls-row">
+        <div class="transport-buttons">
+          <button id="prevBtn" class="btn btn-icon" title="Предыдущий розыгрыш" aria-label="Предыдущий розыгрыш">
+            ⏮
+          </button>
+          <button id="replayBtn" class="btn btn-icon" title="Повторить розыгрыш" aria-label="Повторить розыгрыш">
+            ⟲
+          </button>
+          <button id="playPauseBtn" class="btn btn-icon btn-primary" title="Воспроизведение/Пауза" aria-label="Пауза">
+            ⏸
+          </button>
+          <button id="nextBtn" class="btn btn-icon" title="Следующий розыгрыш" aria-label="Следующий розыгрыш">
+            ⏭
+          </button>
+        </div>
+
+        <button id="shareBtn" class="btn btn-share" title="Поделиться ссылкой" aria-label="Поделиться ссылкой">
+          🔗 Поделиться
+        </button>
+      </div>
+
+      <div class="controls-row">
+        <div class="speed-controls">
+          <span class="speed-label">Скорость:</span>
+          <button class="speed-chip" data-rate="0.5">0.5x</button>
+          <button class="speed-chip" data-rate="0.75">0.75x</button>
+          <button class="speed-chip active" data-rate="1">1x</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rallies List Section -->
+    <section class="rallies-section">
+      <div class="rallies-header">
+        <h2 class="rallies-title">
+          <span>Список розыгрышей</span>
+        </h2>
+        <span id="ralliesCountBadge" class="rallies-counter">Загрузка...</span>
+      </div>
+
+      <div id="ralliesList" class="rallies-list">
+        <!-- Rallies will be rendered here dynamically -->
+      </div>
+    </section>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <span>✓ Ссылка скопирована в буфер обмена</span>
+  </div>
+
+  <!-- YouTube IFrame API Script -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <script>
+    /* =======================================================================
+       VOLLEYBALL HIGHLIGHTS PLAYER - SPA LOGIC
+       ======================================================================= */
+
+    // Application state
+    const state = {
+      matchesIndex: [],
+      currentMatchId: null,
+      matchData: null,
+      activeTgId: null,       // Current active Telegram ID (string)
+      filteredRallies: [],    // Currently displayed / playable rallies
+      currentRallyIndex: 0,   // Index within filteredRallies
+      player: null,           // YT.Player instance
+      isPlayerReady: false,
+      isPlaying: false,
+      playbackRate: 1.0,
+      pollTimer: null,
+      isTransitioning: false,
+      hasUserInteracted: false
+    };
+
+    // DOM Elements
+    const dom = {
+      matchSelect: document.getElementById('matchSelect'),
+      playerSelect: document.getElementById('playerSelect'),
+      userPill: document.getElementById('userPill'),
+      userNameDisplay: document.getElementById('userNameDisplay'),
+      currentRallyBadge: document.getElementById('currentRallyBadge'),
+      currentScoreBadge: document.getElementById('currentScoreBadge'),
+      currentTimerBadge: document.getElementById('currentTimerBadge'),
+      currentParticipants: document.getElementById('currentParticipants'),
+      prevBtn: document.getElementById('prevBtn'),
+      replayBtn: document.getElementById('replayBtn'),
+      playPauseBtn: document.getElementById('playPauseBtn'),
+      nextBtn: document.getElementById('nextBtn'),
+      shareBtn: document.getElementById('shareBtn'),
+      speedChips: document.querySelectorAll('.speed-chip'),
+      ralliesCountBadge: document.getElementById('ralliesCountBadge'),
+      ralliesList: document.getElementById('ralliesList'),
+      toast: document.getElementById('toast'),
+      playOverlay: document.getElementById('playOverlay')
+    };
+
+    /* -----------------------------------------------------------------------
+       1. INITIALIZATION & STATE RESOLUTION
+       ----------------------------------------------------------------------- */
+    document.addEventListener('DOMContentLoaded', () => {
+      initTelegramWebApp();
+      resolveInitialIdentity();
+      loadMatchesCatalog();
+      bindControls();
+    });
+
+    /**
+     * Initializes Telegram WebApp SDK if running inside Telegram
+     */
+    function initTelegramWebApp() {
+      try {
+        if (window.Telegram?.WebApp) {
+          const tg = window.Telegram.WebApp;
+          tg.ready();
+          tg.expand();
+
+          // Match theme colors
+          if (tg.setHeaderColor) tg.setHeaderColor('#0f0f12');
+          if (tg.setBackgroundColor) tg.setBackgroundColor('#0f0f12');
+        }
+      } catch (err) {
+        console.warn('Telegram WebApp init failed:', err);
+      }
+    }
+
+    /**
+     * Resolves tg_id priority:
+     * 1. URL search param ?tg_id=...
+     * 2. Telegram WebApp SDK: window.Telegram.WebApp.initDataUnsafe?.user?.id
+     */
+    function resolveInitialIdentity() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTgId = urlParams.get('tg_id');
+
+      if (urlTgId) {
+        state.activeTgId = String(urlTgId).trim();
+      } else {
+        const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+        if (tgUser && tgUser.id) {
+          state.activeTgId = String(tgUser.id);
+        }
+      }
+    }
+
+    /**
+     * Loads matches catalog from matches/index.json
+     */
+    async function loadMatchesCatalog() {
+      try {
+        const res = await fetch('matches/index.json');
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        state.matchesIndex = await res.json();
+
+        if (!Array.isArray(state.matchesIndex) || state.matchesIndex.length === 0) {
+          throw new Error('Каталог матчей пуст');
+        }
+
+        populateMatchSelect();
+
+        // Determine which match to load:
+        // Priority 1: ?match=...
+        // Priority 2: first match in matches/index.json
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlMatch = urlParams.get('match');
+        const matchExists = state.matchesIndex.some(m => m.id === urlMatch);
+
+        const initialMatchId = matchExists ? urlMatch : state.matchesIndex[0].id;
+        dom.matchSelect.value = initialMatchId;
+
+        await switchMatch(initialMatchId, false);
+      } catch (err) {
+        console.error('Ошибка загрузки matches/index.json:', err);
+        dom.ralliesCountBadge.textContent = 'Ошибка загрузки';
+        dom.ralliesList.innerHTML = `
+          <div class="empty-state">
+            Не удалось загрузить данные матчей.<br>
+            Убедитесь, что файлы matches/index.json доступны.
+          </div>
+        `;
+      }
+    }
+
+    /**
+     * Fills the match selector dropdown
+     */
+    function populateMatchSelect() {
+      dom.matchSelect.innerHTML = '';
+      state.matchesIndex.forEach(match => {
+        const opt = document.createElement('option');
+        opt.value = match.id;
+        opt.textContent = match.title || match.id;
+        dom.matchSelect.appendChild(opt);
+      });
+    }
+
+    /* -----------------------------------------------------------------------
+       2. MATCH & PLAYER SWITCHING
+       ----------------------------------------------------------------------- */
+
+    /**
+     * Switches to a new match by matchId
+     * @param {string} matchId
+     * @param {boolean} autoPlayRally
+     */
+    async function switchMatch(matchId, autoPlayRally = true) {
+      state.currentMatchId = matchId;
+      dom.matchSelect.value = matchId;
+
+      try {
+        dom.ralliesCountBadge.textContent = 'Загрузка данных...';
+        const res = await fetch(`matches/${matchId}.json`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        state.matchData = await res.json();
+
+        // Rebuild players dropdown for this match
+        rebuildPlayerSelect();
+
+        // Filter rallies by currently active player
+        applyFilterAndRender();
+
+        // Update URL state
+        syncUrlState();
+
+        // Handle YouTube video load / switch
+        if (state.isPlayerReady && state.player) {
+          loadCurrentRallyVideo(autoPlayRally);
+        }
+      } catch (err) {
+        console.error(`Ошибка загрузки матча matches/${matchId}.json:`, err);
+        dom.ralliesList.innerHTML = `
+          <div class="empty-state">
+            Не удалось загрузить данные для матча ${matchId}.
+          </div>
+        `;
+      }
+    }
+
+    /**
+     * Rebuilds player dropdown for current match.
+     * Keeps activeTgId if player exists in new match; otherwise resets to 'all'.
+     */
+    function rebuildPlayerSelect() {
+      const players = state.matchData?.players || {};
+      dom.playerSelect.innerHTML = '<option value="">Все игроки</option>';
+
+      let activePlayerPresent = false;
+
+      // Populate sorted list of players
+      const sortedKeys = Object.keys(players).sort((a, b) =>
+        String(players[a]).localeCompare(String(players[b]), 'ru')
+      );
+
+      sortedKeys.forEach(id => {
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = players[id];
+        if (state.activeTgId && String(id) === String(state.activeTgId)) {
+          activePlayerPresent = true;
+          opt.selected = true;
+        }
+        dom.playerSelect.appendChild(opt);
+      });
+
+      if (state.activeTgId && activePlayerPresent) {
+        dom.playerSelect.value = state.activeTgId;
+        showUserPill(players[state.activeTgId]);
+      } else {
+        // Player is not in this match, switch to "all"
+        dom.playerSelect.value = '';
+        state.activeTgId = null;
+        hideUserPill();
+      }
+    }
+
+    function showUserPill(name) {
+      dom.userNameDisplay.textContent = name;
+      dom.userPill.style.display = 'inline-flex';
+    }
+
+    function hideUserPill() {
+      dom.userPill.style.display = 'none';
+    }
+
+    /**
+     * Filters rallies according to active tg_id, updates counter and re-renders cards
+     */
+    function applyFilterAndRender() {
+      if (!state.matchData || !Array.isArray(state.matchData.rallies)) {
+        state.filteredRallies = [];
+      } else if (!state.activeTgId) {
+        // All players
+        state.filteredRallies = [...state.matchData.rallies];
+      } else {
+        // Filter rallies where player participated
+        const targetId = String(state.activeTgId);
+        state.filteredRallies = state.matchData.rallies.filter(r =>
+          Array.isArray(r.players) && r.players.some(p => String(p) === targetId)
+        );
+      }
+
+      state.currentRallyIndex = 0;
+      updateRalliesCounter();
+      renderRalliesList();
+      updatePlayerMetaDisplay();
+    }
+
+    function updateRalliesCounter() {
+      const total = state.matchData?.rallies?.length || 0;
+      const count = state.filteredRallies.length;
+      if (state.activeTgId) {
+        dom.ralliesCountBadge.textContent = `Розыгрышей: ${count} из ${total}`;
+      } else {
+        dom.ralliesCountBadge.textContent = `Розыгрышей: ${total}`;
+      }
+    }
+
+    /**
+     * Renders rally cards into DOM
+     */
+    function renderRalliesList() {
+      dom.ralliesList.innerHTML = '';
+
+      if (state.filteredRallies.length === 0) {
+        dom.ralliesList.innerHTML = `
+          <div class="empty-state">
+            В этом матче нет розыгрышей с участием выбранного игрока.
+          </div>
+        `;
+        return;
+      }
+
+      const playersMap = state.matchData?.players || {};
+
+      state.filteredRallies.forEach((rally, idx) => {
+        const card = document.createElement('div');
+        card.className = `rally-card ${idx === state.currentRallyIndex ? 'active' : ''}`;
+        card.dataset.index = idx;
+
+        const duration = Math.max(0, Math.round(rally.end - rally.start));
+        const timeFormatted = `${formatSeconds(rally.start)} – ${formatSeconds(rally.end)}`;
+
+        // Player chips
+        const playerChipsHtml = (rally.players || []).map(pId => {
+          const isHighlighted = state.activeTgId && String(pId) === String(state.activeTgId);
+          const pName = playersMap[pId] || `ID ${pId}`;
+          return `<span class="player-tag ${isHighlighted ? 'highlighted' : ''}">${escapeHtml(pName)}</span>`;
+        }).join('');
+
+        card.innerHTML = `
+          <div class="rally-card-top">
+            <div class="rally-card-left">
+              <span class="card-rally-num">#${rally.id || (idx + 1)}</span>
+              ${rally.score ? `<span class="card-score">${escapeHtml(rally.score)}</span>` : ''}
+              <span class="card-time">${timeFormatted} (${duration}с)</span>
+            </div>
+            <div class="playing-indicator" title="Воспроизводится">
+              <div class="playing-bar"></div>
+              <div class="playing-bar"></div>
+              <div class="playing-bar"></div>
+            </div>
+          </div>
+          <div class="rally-players-wrap">
+            ${playerChipsHtml}
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          selectRallyByIndex(idx, true);
+        });
+
+        dom.ralliesList.appendChild(card);
+      });
+    }
+
+    /**
+     * Selects a rally by index in filteredRallies and plays it
+     * @param {number} idx
+     * @param {boolean} playImmediately
+     */
+    function selectRallyByIndex(idx, playImmediately = true) {
+      if (idx < 0 || idx >= state.filteredRallies.length) return;
+      state.currentRallyIndex = idx;
+
+      // Update card visual active classes
+      const cards = dom.ralliesList.querySelectorAll('.rally-card');
+      cards.forEach((c, i) => {
+        if (i === idx) {
+          c.classList.add('active');
+          c.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+          c.classList.remove('active');
+        }
+      });
+
+      updatePlayerMetaDisplay();
+      syncUrlState();
+
+      if (state.isPlayerReady && state.player) {
+        loadCurrentRallyVideo(playImmediately);
+      }
+    }
+
+    /**
+     * Updates header status under video player
+     */
+    function updatePlayerMetaDisplay() {
+      const rally = state.filteredRallies[state.currentRallyIndex];
+      if (!rally) {
+        dom.currentRallyBadge.textContent = 'Нет розыгрышей';
+        dom.currentScoreBadge.style.display = 'none';
+        dom.currentTimerBadge.textContent = '';
+        dom.currentParticipants.innerHTML = '';
+        return;
+      }
+
+      dom.currentRallyBadge.textContent = `Розыгрыш #${rally.id || (state.currentRallyIndex + 1)}`;
+
+      if (rally.score) {
+        dom.currentScoreBadge.textContent = rally.score;
+        dom.currentScoreBadge.style.display = 'inline-block';
+      } else {
+        dom.currentScoreBadge.style.display = 'none';
+      }
+
+      const dur = Math.max(0, Math.round(rally.end - rally.start));
+      dom.currentTimerBadge.textContent = `${formatSeconds(rally.start)} – ${formatSeconds(rally.end)} (${dur}с)`;
+
+      const playersMap = state.matchData?.players || {};
+      dom.currentParticipants.innerHTML = (rally.players || []).map(pId => {
+        const isHighlighted = state.activeTgId && String(pId) === String(state.activeTgId);
+        const pName = playersMap[pId] || pId;
+        return `<span class="player-tag ${isHighlighted ? 'highlighted' : ''}">${escapeHtml(pName)}</span>`;
+      }).join('');
+    }
+
+    /* -----------------------------------------------------------------------
+       3. YOUTUBE IFRAME API & PLAYBACK LOGIC
+       ----------------------------------------------------------------------- */
+
+    /**
+     * Global callback invoked automatically by YouTube IFrame API script
+     */
+    window.onYouTubeIframeAPIReady = function() {
+      state.player = new YT.Player('player', {
+        height: '100%',
+        width: '100%',
+        videoId: state.matchData?.videoId || 'dQw4w9WgXcQ',
+        playerVars: {
+          autoplay: 1,
+          playsinline: 1,
+          rel: 0,
+          modestbranding: 1,
+          controls: 1,
+          fs: 1,
+          iv_load_policy: 3
+        },
+        events: {
+          onReady: onPlayerReady,
+          onStateChange: onPlayerStateChange,
+          onError: onPlayerError
+        }
+      });
+    };
+
+    function onPlayerReady(event) {
+      state.isPlayerReady = true;
+      if (state.playbackRate !== 1.0) {
+        state.player.setPlaybackRate(state.playbackRate);
+      }
+
+      // Start continuous rally end detection timer (200ms)
+      startRallyWatcher();
+
+      // If match data already loaded, play initial rally
+      if (state.filteredRallies.length > 0) {
+        loadCurrentRallyVideo(false);
+      }
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.PLAYING) {
+        state.isPlaying = true;
+        updatePlayPauseBtnState(true);
+        hidePlayOverlay();
+      } else if (event.data === YT.PlayerState.PAUSED) {
+        state.isPlaying = false;
+        updatePlayPauseBtnState(false);
+      } else if (event.data === YT.PlayerState.ENDED) {
+        state.isPlaying = false;
+        updatePlayPauseBtnState(false);
+        // Video finished or rally boundary hit
+        handleRallyFinished();
+      }
+    }
+
+    function onPlayerError(event) {
+      console.warn('YouTube Player Error:', event.data);
+    }
+
+    /**
+     * Loads current rally into the player
+     * @param {boolean} play
+     */
+    function loadCurrentRallyVideo(play = true) {
+      if (!state.player || !state.isPlayerReady || !state.matchData) return;
+
+      const rally = state.filteredRallies[state.currentRallyIndex];
+      if (!rally) return;
+
+      state.isTransitioning = false;
+
+      try {
+        state.player.loadVideoById({
+          videoId: state.matchData.videoId,
+          startSeconds: rally.start,
+          endSeconds: rally.end
+        });
+
+        if (state.playbackRate !== 1.0) {
+          state.player.setPlaybackRate(state.playbackRate);
+        }
+
+        if (play) {
+          state.player.playVideo();
+        }
+      } catch (err) {
+        console.warn('Error loading video by ID:', err);
+      }
+    }
+
+    /**
+     * Continuous 200ms polling to reliably detect rally end
+     */
+    function startRallyWatcher() {
+      if (state.pollTimer) clearInterval(state.pollTimer);
+
+      state.pollTimer = setInterval(() => {
+        if (!state.isPlayerReady || !state.player || state.isTransitioning) return;
+
+        const rally = state.filteredRallies[state.currentRallyIndex];
+        if (!rally) return;
+
+        try {
+          const currentTime = state.player.getCurrentTime();
+          // If playback crossed rally.end (with a slight margin)
+          if (typeof currentTime === 'number' && currentTime >= rally.end - 0.25) {
+            handleRallyFinished();
+          }
+        } catch (e) {
+          // Player might be switching or initializing
+        }
+      }, 200);
+    }
+
+    /**
+     * Handles reaching end of current rally -> auto advances to next
+     */
+    function handleRallyFinished() {
+      if (state.isTransitioning) return;
+      state.isTransitioning = true;
+
+      // Auto-transition to next rally
+      if (state.currentRallyIndex + 1 < state.filteredRallies.length) {
+        selectRallyByIndex(state.currentRallyIndex + 1, true);
+      } else {
+        // Loop back to first rally or pause at finish
+        selectRallyByIndex(0, true);
+      }
+    }
+
+    /* -----------------------------------------------------------------------
+       4. CONTROLS & EVENT HANDLERS
+       ----------------------------------------------------------------------- */
+    function bindControls() {
+      // Match selector change
+      dom.matchSelect.addEventListener('change', async (e) => {
+        const newMatchId = e.target.value;
+        await switchMatch(newMatchId, true);
+      });
+
+      // Player selector change
+      dom.playerSelect.addEventListener('change', (e) => {
+        const val = e.target.value;
+        state.activeTgId = val ? String(val) : null;
+
+        if (state.activeTgId && state.matchData?.players?.[state.activeTgId]) {
+          showUserPill(state.matchData.players[state.activeTgId]);
+        } else {
+          hideUserPill();
+        }
+
+        applyFilterAndRender();
+        syncUrlState();
+
+        if (state.filteredRallies.length > 0) {
+          selectRallyByIndex(0, true);
+        }
+      });
+
+      // Previous button
+      dom.prevBtn.addEventListener('click', prevRally);
+
+      // Replay button
+      dom.replayBtn.addEventListener('click', replayRally);
+
+      // Play/Pause button
+      dom.playPauseBtn.addEventListener('click', togglePlayPause);
+
+      // Next button
+      dom.nextBtn.addEventListener('click', nextRally);
+
+      // Share button
+      dom.shareBtn.addEventListener('click', copyShareLink);
+
+      // Speed chips
+      dom.speedChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          const rate = parseFloat(chip.dataset.rate) || 1.0;
+          setSpeed(rate);
+        });
+      });
+
+      // Overlay play click (for mobile autoplay policy unlock)
+      dom.playOverlay.addEventListener('click', () => {
+        hidePlayOverlay();
+        if (state.player && state.player.playVideo) {
+          state.player.playVideo();
+        }
+      });
+
+      // Keyboard shortcuts for convenience
+      document.addEventListener('keydown', (e) => {
+        if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;
+        if (e.code === 'Space') {
+          e.preventDefault();
+          togglePlayPause();
+        } else if (e.code === 'ArrowRight') {
+          e.preventDefault();
+          nextRally();
+        } else if (e.code === 'ArrowLeft') {
+          e.preventDefault();
+          prevRally();
+        } else if (e.code === 'KeyR') {
+          e.preventDefault();
+          replayRally();
+        }
+      });
+    }
+
+    function prevRally() {
+      if (state.filteredRallies.length === 0) return;
+      let target = state.currentRallyIndex - 1;
+      if (target < 0) target = state.filteredRallies.length - 1;
+      selectRallyByIndex(target, true);
+    }
+
+    function replayRally() {
+      if (state.filteredRallies.length === 0) return;
+      const rally = state.filteredRallies[state.currentRallyIndex];
+      if (rally && state.player && state.player.seekTo) {
+        state.isTransitioning = false;
+        state.player.seekTo(rally.start, true);
+        state.player.playVideo();
+      }
+    }
+
+    function nextRally() {
+      if (state.filteredRallies.length === 0) return;
+      let target = state.currentRallyIndex + 1;
+      if (target >= state.filteredRallies.length) target = 0;
+      selectRallyByIndex(target, true);
+    }
+
+    function togglePlayPause() {
+      if (!state.player || !state.isPlayerReady) return;
+      if (state.isPlaying) {
+        state.player.pauseVideo();
+      } else {
+        state.player.playVideo();
+      }
+    }
+
+    function updatePlayPauseBtnState(isPlaying) {
+      if (isPlaying) {
+        dom.playPauseBtn.textContent = '⏸';
+        dom.playPauseBtn.title = 'Пауза';
+      } else {
+        dom.playPauseBtn.textContent = '▶';
+        dom.playPauseBtn.title = 'Воспроизведение';
+      }
+    }
+
+    function hidePlayOverlay() {
+      dom.playOverlay.classList.remove('show');
+    }
+
+    function setSpeed(rate) {
+      state.playbackRate = rate;
+      dom.speedChips.forEach(c => {
+        if (parseFloat(c.dataset.rate) === rate) {
+          c.classList.add('active');
+        } else {
+          c.classList.remove('active');
+        }
+      });
+
+      if (state.player && state.player.setPlaybackRate) {
+        state.player.setPlaybackRate(rate);
+      }
+    }
+
+    /* -----------------------------------------------------------------------
+       5. URL SYNCHRONIZATION & SHARING
+       ----------------------------------------------------------------------- */
+
+    /**
+     * Updates URL with history.replaceState()
+     */
+    function syncUrlState() {
+      const url = new URL(window.location.href);
+
+      if (state.currentMatchId) {
+        url.searchParams.set('match', state.currentMatchId);
+      } else {
+        url.searchParams.delete('match');
+      }
+
+      if (state.activeTgId) {
+        url.searchParams.set('tg_id', state.activeTgId);
+      } else {
+        url.searchParams.delete('tg_id');
+      }
+
+      window.history.replaceState(null, '', url.toString());
+    }
+
+    /**
+     * Copies shareable URL to clipboard and triggers visual toast
+     */
+    async function copyShareLink() {
+      syncUrlState();
+      const shareUrl = window.location.href;
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(shareUrl);
+        } else {
+          // Fallback for older web views
+          const textArea = document.createElement('textarea');
+          textArea.value = shareUrl;
+          textArea.style.position = 'fixed';
+          textArea.style.opacity = '0';
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+        }
+
+        // Haptic feedback for Telegram WebApp
+        if (window.Telegram?.WebApp?.HapticFeedback) {
+          window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        }
+
+        showToast('✓ Ссылка на розыгрыши скопирована!');
+      } catch (err) {
+        console.error('Не удалось скопировать ссылку:', err);
+        showToast('Не удалось скопировать ссылку');
+      }
+    }
+
+    function showToast(text) {
+      dom.toast.querySelector('span').textContent = text;
+      dom.toast.classList.add('show');
+      setTimeout(() => {
+        dom.toast.classList.remove('show');
+      }, 2500);
+    }
+
+    /* -----------------------------------------------------------------------
+       6. UTILITIES
+       ----------------------------------------------------------------------- */
+    function formatSeconds(totalSeconds) {
+      const sec = Math.max(0, Math.floor(totalSeconds || 0));
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+  </script>
+</body>
+</html>
