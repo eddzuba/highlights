@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Волейбольные хайлайты розыгрышей</title>
+  <title>The Gardens Volleyball Highlights</title>
   
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -18,15 +18,8 @@
       --accent-hover: #2563eb;
       --accent-glow: rgba(59, 130, 246, 0.35);
       --accent-secondary: #ff4757;
-      --accent-secondary-glow: rgba(255, 71, 87, 0.25);
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
-      --text-sub: #6b7280;
-      --badge-bg: rgba(59, 130, 246, 0.15);
-      --badge-border: rgba(59, 130, 246, 0.4);
-      --badge-text: #60a5fa;
-      --tag-bg: #272733;
-      --tag-text: #d1d5db;
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
@@ -59,7 +52,7 @@
       padding: 12px 14px 40px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
     /* Header */
@@ -224,104 +217,22 @@
       border: 0;
     }
 
-    .player-overlay-status {
+    /* Controls & Speed Bar (directly replacing status overlay) */
+    .player-controls-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 14px;
+      padding: 10px 14px;
       background: var(--card-bg);
       border-top: 1px solid var(--card-border);
-      font-size: 0.85rem;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .rally-current-meta {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 600;
-      flex-wrap: wrap;
-    }
-
-    .rally-num-badge {
-      background: var(--accent);
-      color: #fff;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      font-weight: 700;
-    }
-
-    .rally-progress-badge {
-      background: #252530;
-      color: var(--text-main);
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      border: 1px solid var(--card-border);
-      font-weight: 500;
-    }
-
-    .rally-score-badge {
-      background: var(--tag-bg);
-      color: #fbbf24;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.82rem;
-      font-family: monospace;
-      font-weight: 700;
-    }
-
-    .rally-timer-badge {
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* Player Chips */
-    .rally-players-wrap {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .player-tag {
-      font-size: 0.76rem;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: var(--tag-bg);
-      color: var(--tag-text);
-      font-weight: 500;
-      transition: all 0.15s ease;
-    }
-
-    .player-tag.highlighted {
-      background: var(--badge-bg);
-      border: 1px solid var(--badge-border);
-      color: var(--badge-text);
-      font-weight: 600;
-      box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
-    }
-
-    /* Controls Bar */
-    .controls-panel {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-lg);
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
       gap: 12px;
+      flex-wrap: wrap;
     }
 
-    .controls-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
+    @media (max-width: 480px) {
+      .player-controls-bar {
+        justify-content: center;
+      }
     }
 
     .transport-buttons {
@@ -376,18 +287,6 @@
       border-color: var(--accent-hover);
     }
 
-    .btn-share {
-      background: rgba(59, 130, 246, 0.12);
-      border: 1px solid rgba(59, 130, 246, 0.35);
-      color: #60a5fa;
-      margin-left: auto;
-    }
-
-    .btn-share:hover {
-      background: rgba(59, 130, 246, 0.22);
-      border-color: rgba(59, 130, 246, 0.5);
-    }
-
     /* Speed Selector Chips */
     .speed-controls {
       display: flex;
@@ -430,34 +329,6 @@
       color: #fff;
       border-color: var(--accent);
       box-shadow: 0 2px 8px var(--accent-glow);
-    }
-
-    /* Toast Notification */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: #1f2937;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 30px;
-      border: 1px solid #374151;
-      font-size: 0.88rem;
-      font-weight: 500;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-      opacity: 0;
-      pointer-events: none;
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
     }
 
     /* Autoplay helper overlay */
@@ -516,7 +387,7 @@
         <div class="logo-block">
           <div class="logo-icon">🏐</div>
           <div>
-            <h1 class="app-title">Volleyball Highlights</h1>
+            <h1 class="app-title">The Gardens Volleyball Highlights</h1>
             <p class="app-subtitle">Персональный видеоплеер розыгрышей</p>
           </div>
         </div>
@@ -563,21 +434,8 @@
         </div>
       </div>
 
-      <!-- Current Rally Meta info under video -->
-      <div class="player-overlay-status">
-        <div class="rally-current-meta">
-          <span id="currentRallyBadge" class="rally-num-badge">Розыгрыш #1</span>
-          <span id="ralliesCountBadge" class="rally-progress-badge">1 из 1</span>
-          <span id="currentScoreBadge" class="rally-score-badge">0:0</span>
-          <span id="currentTimerBadge" class="rally-timer-badge">00:00 / 00:00</span>
-        </div>
-        <div id="currentParticipants" class="rally-players-wrap"></div>
-      </div>
-    </div>
-
-    <!-- Controls Bar -->
-    <div class="controls-panel">
-      <div class="controls-row">
+      <!-- Controls & Speed Bar (directly under video) -->
+      <div class="player-controls-bar">
         <div class="transport-buttons">
           <button id="prevBtn" class="btn btn-icon" title="Предыдущий розыгрыш" aria-label="Предыдущий розыгрыш">
             ⏮
@@ -593,12 +451,6 @@
           </button>
         </div>
 
-        <button id="shareBtn" class="btn btn-share" title="Поделиться ссылкой" aria-label="Поделиться ссылкой">
-          🔗 Поделиться
-        </button>
-      </div>
-
-      <div class="controls-row">
         <div class="speed-controls">
           <span class="speed-label">Скорость:</span>
           <button class="speed-chip" data-rate="0.5">0.5x</button>
@@ -607,11 +459,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Toast Notification -->
-  <div id="toast" class="toast">
-    <span>✓ Ссылка скопирована в буфер обмена</span>
   </div>
 
   <!-- YouTube IFrame API Script -->
@@ -644,18 +491,11 @@
       playerSelect: document.getElementById('playerSelect'),
       userPill: document.getElementById('userPill'),
       userNameDisplay: document.getElementById('userNameDisplay'),
-      currentRallyBadge: document.getElementById('currentRallyBadge'),
-      currentScoreBadge: document.getElementById('currentScoreBadge'),
-      currentTimerBadge: document.getElementById('currentTimerBadge'),
-      currentParticipants: document.getElementById('currentParticipants'),
-      ralliesCountBadge: document.getElementById('ralliesCountBadge'),
       prevBtn: document.getElementById('prevBtn'),
       replayBtn: document.getElementById('replayBtn'),
       playPauseBtn: document.getElementById('playPauseBtn'),
       nextBtn: document.getElementById('nextBtn'),
-      shareBtn: document.getElementById('shareBtn'),
       speedChips: document.querySelectorAll('.speed-chip'),
-      toast: document.getElementById('toast'),
       playOverlay: document.getElementById('playOverlay')
     };
 
@@ -735,8 +575,6 @@
         await switchMatch(initialMatchId, false);
       } catch (err) {
         console.error('Ошибка загрузки matches/index.json:', err);
-        dom.currentRallyBadge.textContent = 'Ошибка загрузки';
-        dom.ralliesCountBadge.textContent = '—';
       }
     }
 
@@ -767,7 +605,6 @@
       dom.matchSelect.value = matchId;
 
       try {
-        dom.ralliesCountBadge.textContent = '...';
         const res = await fetch(`matches/${matchId}.json`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         state.matchData = await res.json();
@@ -787,7 +624,6 @@
         }
       } catch (err) {
         console.error(`Ошибка загрузки матча matches/${matchId}.json:`, err);
-        dom.currentRallyBadge.textContent = 'Ошибка загрузки';
       }
     }
 
@@ -838,7 +674,7 @@
     }
 
     /**
-     * Filters rallies according to active tg_id, updates counter and current rally display
+     * Filters rallies according to active tg_id
      */
     function applyFilterAndRender() {
       if (!state.matchData || !Array.isArray(state.matchData.rallies)) {
@@ -855,7 +691,6 @@
       }
 
       state.currentRallyIndex = 0;
-      updatePlayerMetaDisplay();
     }
 
     /**
@@ -867,49 +702,11 @@
       if (idx < 0 || idx >= state.filteredRallies.length) return;
       state.currentRallyIndex = idx;
 
-      updatePlayerMetaDisplay();
       syncUrlState();
 
       if (state.isPlayerReady && state.player) {
         loadCurrentRallyVideo(playImmediately);
       }
-    }
-
-    /**
-     * Updates header status under video player
-     */
-    function updatePlayerMetaDisplay() {
-      const total = state.filteredRallies.length;
-      const rally = state.filteredRallies[state.currentRallyIndex];
-
-      if (!rally || total === 0) {
-        dom.currentRallyBadge.textContent = 'Нет розыгрышей';
-        dom.ralliesCountBadge.textContent = '0 из 0';
-        dom.currentScoreBadge.style.display = 'none';
-        dom.currentTimerBadge.textContent = '';
-        dom.currentParticipants.innerHTML = '<span style="color:var(--text-muted);font-size:0.8rem;">В этом матче нет розыгрышей с данным игроком</span>';
-        return;
-      }
-
-      dom.currentRallyBadge.textContent = `Розыгрыш #${rally.id || (state.currentRallyIndex + 1)}`;
-      dom.ralliesCountBadge.textContent = `${state.currentRallyIndex + 1} из ${total}`;
-
-      if (rally.score) {
-        dom.currentScoreBadge.textContent = rally.score;
-        dom.currentScoreBadge.style.display = 'inline-block';
-      } else {
-        dom.currentScoreBadge.style.display = 'none';
-      }
-
-      const dur = Math.max(0, Math.round(rally.end - rally.start));
-      dom.currentTimerBadge.textContent = `${formatSeconds(rally.start)} – ${formatSeconds(rally.end)} (${dur}с)`;
-
-      const playersMap = state.matchData?.players || {};
-      dom.currentParticipants.innerHTML = (rally.players || []).map(pId => {
-        const isHighlighted = state.activeTgId && String(pId) === String(state.activeTgId);
-        const pName = playersMap[pId] || pId;
-        return `<span class="player-tag ${isHighlighted ? 'highlighted' : ''}">${escapeHtml(pName)}</span>`;
-      }).join('');
     }
 
     /* -----------------------------------------------------------------------
@@ -967,7 +764,6 @@
       } else if (event.data === YT.PlayerState.ENDED) {
         state.isPlaying = false;
         updatePlayPauseBtnState(false);
-        // Video finished or rally boundary hit
         handleRallyFinished();
       }
     }
@@ -1021,7 +817,7 @@
 
         try {
           const currentTime = state.player.getCurrentTime();
-          // If playback crossed rally.end (with a slight margin)
+          // If playback crossed rally.end
           if (typeof currentTime === 'number' && currentTime >= rally.end - 0.25) {
             handleRallyFinished();
           }
@@ -1087,9 +883,6 @@
 
       // Next button
       dom.nextBtn.addEventListener('click', nextRally);
-
-      // Share button
-      dom.shareBtn.addEventListener('click', copyShareLink);
 
       // Speed chips
       dom.speedChips.forEach(chip => {
@@ -1189,7 +982,7 @@
     }
 
     /* -----------------------------------------------------------------------
-       5. URL SYNCHRONIZATION & SHARING
+       5. URL SYNCHRONIZATION
        ----------------------------------------------------------------------- */
 
     /**
@@ -1211,68 +1004,6 @@
       }
 
       window.history.replaceState(null, '', url.toString());
-    }
-
-    /**
-     * Copies shareable URL to clipboard and triggers visual toast
-     */
-    async function copyShareLink() {
-      syncUrlState();
-      const shareUrl = window.location.href;
-
-      try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          await navigator.clipboard.writeText(shareUrl);
-        } else {
-          // Fallback for older web views
-          const textArea = document.createElement('textarea');
-          textArea.value = shareUrl;
-          textArea.style.position = 'fixed';
-          textArea.style.opacity = '0';
-          document.body.appendChild(textArea);
-          textArea.select();
-          document.execCommand('copy');
-          document.body.removeChild(textArea);
-        }
-
-        // Haptic feedback for Telegram WebApp
-        if (window.Telegram?.WebApp?.HapticFeedback) {
-          window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-        }
-
-        showToast('✓ Ссылка на розыгрыши скопирована!');
-      } catch (err) {
-        console.error('Не удалось скопировать ссылку:', err);
-        showToast('Не удалось скопировать ссылку');
-      }
-    }
-
-    function showToast(text) {
-      dom.toast.querySelector('span').textContent = text;
-      dom.toast.classList.add('show');
-      setTimeout(() => {
-        dom.toast.classList.remove('show');
-      }, 2500);
-    }
-
-    /* -----------------------------------------------------------------------
-       6. UTILITIES
-       ----------------------------------------------------------------------- */
-    function formatSeconds(totalSeconds) {
-      const sec = Math.max(0, Math.floor(totalSeconds || 0));
-      const m = Math.floor(sec / 60);
-      const s = sec % 60;
-      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
     }
   </script>
 </body>
