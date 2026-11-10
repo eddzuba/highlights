@@ -100,26 +100,6 @@
       color: var(--text-muted);
     }
 
-    .user-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      color: var(--text-main);
-      font-weight: 500;
-    }
-
-    .user-pill .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
-    }
 
     /* Selectors Grid */
     .filters-bar {
@@ -391,11 +371,6 @@
             <p class="app-subtitle">Персональный видеоплеер розыгрышей</p>
           </div>
         </div>
-
-        <div id="userPill" class="user-pill" style="display: none;">
-          <span class="status-dot"></span>
-          <span id="userNameDisplay">Игрок</span>
-        </div>
       </div>
 
       <!-- Match and Player Selectors -->
@@ -489,8 +464,6 @@
     const dom = {
       matchSelect: document.getElementById('matchSelect'),
       playerSelect: document.getElementById('playerSelect'),
-      userPill: document.getElementById('userPill'),
-      userNameDisplay: document.getElementById('userNameDisplay'),
       prevBtn: document.getElementById('prevBtn'),
       replayBtn: document.getElementById('replayBtn'),
       playPauseBtn: document.getElementById('playPauseBtn'),
@@ -655,22 +628,11 @@
 
       if (state.activeTgId && activePlayerPresent) {
         dom.playerSelect.value = state.activeTgId;
-        showUserPill(players[state.activeTgId]);
       } else {
         // Player is not in this match, switch to "all"
         dom.playerSelect.value = '';
         state.activeTgId = null;
-        hideUserPill();
       }
-    }
-
-    function showUserPill(name) {
-      dom.userNameDisplay.textContent = name;
-      dom.userPill.style.display = 'inline-flex';
-    }
-
-    function hideUserPill() {
-      dom.userPill.style.display = 'none';
     }
 
     /**
@@ -857,12 +819,6 @@
       dom.playerSelect.addEventListener('change', (e) => {
         const val = e.target.value;
         state.activeTgId = val ? String(val) : null;
-
-        if (state.activeTgId && state.matchData?.players?.[state.activeTgId]) {
-          showUserPill(state.matchData.players[state.activeTgId]);
-        } else {
-          hideUserPill();
-        }
 
         applyFilterAndRender();
         syncUrlState();
