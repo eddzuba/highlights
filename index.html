@@ -46,27 +46,203 @@
 
     /* Container */
     .app-container {
-      max-width: 680px;
-      margin: 0 auto;
       width: 100%;
+      margin: 0 auto;
       padding: 12px 14px 40px;
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
 
-    /* Header */
-    header {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding-top: 4px;
+    /* -----------------------------------------------------------------------
+       MOBILE / DEFAULT LAYOUT (Single Column)
+       ----------------------------------------------------------------------- */
+    @media (max-width: 899px) {
+      .app-container {
+        max-width: 680px;
+      }
+
+      /* Unroll console so children participate in vertical flow */
+      .control-console {
+        display: contents;
+      }
+
+      .console-header {
+        order: 1;
+        padding-top: 4px;
+      }
+
+      .console-filters {
+        order: 2;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      @media (max-width: 540px) {
+        .console-filters {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .video-panel {
+        order: 3;
+      }
+
+      .console-controls {
+        order: 4;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius-lg);
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .console-controls-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      @media (max-width: 480px) {
+        .console-controls-row {
+          justify-content: center;
+        }
+      }
+
+      .desktop-only-divider,
+      .desktop-shortcuts-hint {
+        display: none !important;
+      }
     }
 
+    /* -----------------------------------------------------------------------
+       DESKTOP LAYOUT (Two Columns: Left = Control Console, Right = Video)
+       ----------------------------------------------------------------------- */
+    @media (min-width: 900px) {
+      .app-container {
+        max-width: 1540px;
+        padding: 20px 28px 40px;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 24px;
+      }
+
+      /* Left Column: Control Console */
+      .control-console {
+        width: 360px;
+        flex-shrink: 0;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius-lg);
+        padding: 22px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+        position: sticky;
+        top: 20px;
+      }
+
+      .console-header {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .console-filters {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .console-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .console-controls-row {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .transport-buttons {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+      }
+
+      .transport-buttons .btn {
+        width: 100%;
+        min-width: 0;
+        padding: 0;
+      }
+
+      .speed-controls {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .speed-chips-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .desktop-only-divider {
+        height: 1px;
+        background: var(--card-border);
+        margin: 2px 0;
+      }
+
+      .desktop-shortcuts-hint {
+        font-size: 0.73rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius-sm);
+        padding: 8px 10px;
+      }
+
+      .desktop-shortcuts-hint kbd {
+        display: inline-block;
+        padding: 1px 5px;
+        font-size: 0.7rem;
+        font-family: inherit;
+        background: #252530;
+        border: 1px solid #373748;
+        border-radius: 4px;
+        color: #fff;
+      }
+
+      /* Right Column: Full-Space Video */
+      .video-panel {
+        flex: 1;
+        min-width: 0;
+        position: sticky;
+        top: 20px;
+      }
+    }
+
+    /* -----------------------------------------------------------------------
+       SHARED ELEMENT STYLES
+       ----------------------------------------------------------------------- */
+
+    /* Brand / Header */
     .brand-bar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 12px;
     }
 
@@ -77,15 +253,16 @@
     }
 
     .logo-icon {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       background: linear-gradient(135deg, #3b82f6, #ff4757);
-      border-radius: 10px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 22px;
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+      flex-shrink: 0;
     }
 
     .app-title {
@@ -93,6 +270,7 @@
       font-weight: 700;
       letter-spacing: -0.02em;
       color: #fff;
+      line-height: 1.25;
     }
 
     .app-subtitle {
@@ -100,20 +278,7 @@
       color: var(--text-muted);
     }
 
-
-    /* Selectors Grid */
-    .filters-bar {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    @media (max-width: 600px) {
-      .filters-bar {
-        grid-template-columns: 1fr;
-      }
-    }
-
+    /* Selectors */
     .select-group {
       display: flex;
       flex-direction: column;
@@ -138,7 +303,7 @@
     .custom-select-wrap select {
       width: 100%;
       height: var(--min-touch-target);
-      background-color: var(--card-bg);
+      background-color: #252530;
       color: var(--text-main);
       border: 1px solid var(--card-border);
       border-radius: var(--radius-md);
@@ -171,14 +336,15 @@
       pointer-events: none;
     }
 
-    /* Player Container (16:9) */
+    /* Video Player Card (16:9) */
     .player-card {
       background: #000;
       border: 1px solid var(--card-border);
       border-radius: var(--radius-lg);
       overflow: hidden;
       position: relative;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      width: 100%;
     }
 
     .video-wrapper {
@@ -197,24 +363,7 @@
       border: 0;
     }
 
-    /* Controls & Speed Bar (directly replacing status overlay) */
-    .player-controls-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      background: var(--card-bg);
-      border-top: 1px solid var(--card-border);
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    @media (max-width: 480px) {
-      .player-controls-bar {
-        justify-content: center;
-      }
-    }
-
+    /* Transport Buttons */
     .transport-buttons {
       display: flex;
       align-items: center;
@@ -253,7 +402,7 @@
       padding: 0;
       width: 48px;
       height: var(--min-touch-target);
-      font-size: 1.1rem;
+      font-size: 1.15rem;
     }
 
     .btn-primary {
@@ -361,20 +510,25 @@
 <body>
 
   <div class="app-container">
-    <!-- Header -->
-    <header>
-      <div class="brand-bar">
-        <div class="logo-block">
-          <div class="logo-icon">🏐</div>
-          <div>
-            <h1 class="app-title">The Gardens Volleyball Highlights</h1>
-            <p class="app-subtitle">Персональный видеоплеер розыгрышей</p>
+    <!-- Left Column on Desktop / Normal Flow on Mobile: Control Console -->
+    <aside class="control-console">
+      <!-- Header -->
+      <header class="console-header">
+        <div class="brand-bar">
+          <div class="logo-block">
+            <div class="logo-icon">🏐</div>
+            <div>
+              <h1 class="app-title">The Gardens Volleyball Highlights</h1>
+              <p class="app-subtitle">Персональный видеоплеер розыгрышей</p>
+            </div>
           </div>
         </div>
-      </div>
+      </header>
+
+      <div class="desktop-only-divider"></div>
 
       <!-- Match and Player Selectors -->
-      <div class="filters-bar">
+      <div class="console-filters">
         <div class="select-group">
           <label class="select-label" for="matchSelect">
             <span>📅 Выбор матча</span>
@@ -397,43 +551,58 @@
           </div>
         </div>
       </div>
-    </header>
 
-    <!-- Player Container -->
-    <div class="player-card">
-      <div class="video-wrapper">
-        <div id="player"></div>
-        <div id="playOverlay" class="play-overlay">
-          <div class="play-big-btn">▶</div>
-          <div class="play-hint-text">Нажмите для воспроизведения розыгрыша</div>
+      <div class="desktop-only-divider"></div>
+
+      <!-- Controls & Speed Bar -->
+      <div class="console-controls">
+        <div class="console-controls-row">
+          <div class="transport-buttons">
+            <button id="prevBtn" class="btn btn-icon" title="Предыдущий розыгрыш" aria-label="Предыдущий розыгрыш">
+              ⏮
+            </button>
+            <button id="replayBtn" class="btn btn-icon" title="Повторить розыгрыш" aria-label="Повторить розыгрыш">
+              ⟲
+            </button>
+            <button id="playPauseBtn" class="btn btn-icon btn-primary" title="Воспроизведение/Пауза" aria-label="Пауза">
+              ⏸
+            </button>
+            <button id="nextBtn" class="btn btn-icon" title="Следующий розыгрыш" aria-label="Следующий розыгрыш">
+              ⏭
+            </button>
+          </div>
+
+          <div class="speed-controls">
+            <span class="speed-label">Скорость:</span>
+            <div class="speed-chips-group">
+              <button class="speed-chip" data-rate="0.5">0.5x</button>
+              <button class="speed-chip" data-rate="0.75">0.75x</button>
+              <button class="speed-chip active" data-rate="1">1x</button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Controls & Speed Bar (directly under video) -->
-      <div class="player-controls-bar">
-        <div class="transport-buttons">
-          <button id="prevBtn" class="btn btn-icon" title="Предыдущий розыгрыш" aria-label="Предыдущий розыгрыш">
-            ⏮
-          </button>
-          <button id="replayBtn" class="btn btn-icon" title="Повторить розыгрыш" aria-label="Повторить розыгрыш">
-            ⟲
-          </button>
-          <button id="playPauseBtn" class="btn btn-icon btn-primary" title="Воспроизведение/Пауза" aria-label="Пауза">
-            ⏸
-          </button>
-          <button id="nextBtn" class="btn btn-icon" title="Следующий розыгрыш" aria-label="Следующий розыгрыш">
-            ⏭
-          </button>
-        </div>
+      <div class="desktop-shortcuts-hint">
+        💡 <b>Горячие клавиши:</b><br>
+        <kbd>Пробел</kbd> — пауза / плей<br>
+        <kbd>←</kbd> / <kbd>→</kbd> — розыгрыши<br>
+        <kbd>R</kbd> — повторить текущий
+      </div>
+    </aside>
 
-        <div class="speed-controls">
-          <span class="speed-label">Скорость:</span>
-          <button class="speed-chip" data-rate="0.5">0.5x</button>
-          <button class="speed-chip" data-rate="0.75">0.75x</button>
-          <button class="speed-chip active" data-rate="1">1x</button>
+    <!-- Right Column on Desktop / In-flow on Mobile: Full-Space Video -->
+    <main class="video-panel">
+      <div class="player-card">
+        <div class="video-wrapper">
+          <div id="player"></div>
+          <div id="playOverlay" class="play-overlay">
+            <div class="play-big-btn">▶</div>
+            <div class="play-hint-text">Нажмите для воспроизведения розыгрыша</div>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   </div>
 
   <!-- YouTube IFrame API Script -->
@@ -441,7 +610,7 @@
 
   <script>
     /* =======================================================================
-       VOLLEYBALL HIGHLIGHTS PLAYER - SPA LOGIC
+       THE GARDENS VOLLEYBALL HIGHLIGHTS - SPA LOGIC
        ======================================================================= */
 
     // Application state
