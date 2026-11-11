@@ -380,6 +380,25 @@
       width: 100%;
       height: 100%;
       border: 0;
+      pointer-events: none;
+    }
+
+    .transition-curtain {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0a0a0f;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 6;
+      transition: opacity 0.15s ease-out;
+    }
+
+    .transition-curtain.active {
+      opacity: 1;
+      transition: opacity 0.08s ease-in;
     }
 
     /* Transport Buttons */
@@ -619,6 +638,7 @@
       <div class="player-card">
         <div class="video-wrapper" id="videoWrapper">
           <div id="player"></div>
+          <div id="transitionCurtain" class="transition-curtain"></div>
           <div id="videoClickLayer" class="video-click-layer" title="Пауза / Плей (двойной клик — во весь экран)"></div>
           <div id="playOverlay" class="play-overlay">
             <div class="play-big-btn">▶</div>
@@ -666,6 +686,7 @@
       fullscreenBtn: document.getElementById('fullscreenBtn'),
       speedChips: document.querySelectorAll('.speed-chip'),
       playOverlay: document.getElementById('playOverlay'),
+      transitionCurtain: document.getElementById('transitionCurtain'),
       videoWrapper: document.getElementById('videoWrapper'),
       videoClickLayer: document.getElementById('videoClickLayer')
     };
@@ -867,14 +888,22 @@
 
       syncUrlState();
 
+      // Show smooth quick transition curtain to mask YouTube's internal seekTo bezel / title flash
+      if (dom.transitionCurtain && playImmediately) {
+        dom.transitionCurtain.classList.add('active');
+      }
+
       if (state.isPlayerReady && state.player) {
         loadCurrentRallyVideo(playImmediately);
       }
 
-      // Clear transitioning flag after seek settles (300ms)
+      // Fade out transition curtain once seek settles and playback resumes
       setTimeout(() => {
+        if (dom.transitionCurtain) {
+          dom.transitionCurtain.classList.remove('active');
+        }
         state.isTransitioning = false;
-      }, 300);
+      }, 320);
     }
 
     /* -----------------------------------------------------------------------
@@ -943,6 +972,9 @@
         return;
       }
       loadCurrentRallyVideo(autoPlay);
+      if (autoPlay) {
+        checkAutoplayPolicy();
+      }
     }
 
     function onPlayerStateChange(event) {
@@ -953,6 +985,9 @@
       } else if (event.data === YT.PlayerState.PAUSED) {
         state.isPlaying = false;
         updatePlayPauseBtnState(false);
+        if (!state.isTransitioning) {
+          showPlayOverlay();
+        }
       } else if (event.data === YT.PlayerState.ENDED) {
         state.isPlaying = false;
         updatePlayPauseBtnState(false);
@@ -1030,8 +1065,9 @@
         }
 
         if (play) {
-          state.player.playVideo();
-          checkAutoplayPolicy();
+          if (!state.isPlaying) {
+            state.player.playVideo();
+          }
         } else {
           state.player.pauseVideo();
         }
