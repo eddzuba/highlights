@@ -627,6 +627,7 @@
       currentLoadedVideoId: null,
       playbackRate: 1.0,
       pollTimer: null,
+      autoplayTimer: null,
       isTransitioning: false
     };
 
@@ -650,6 +651,10 @@
       resolveInitialIdentity();
       loadMatchesCatalog();
       bindControls();
+
+      if (window.YT && window.YT.Player && !state.player) {
+        initYouTubePlayer();
+      }
     });
 
     /**
@@ -715,7 +720,7 @@
         const initialMatchId = matchExists ? urlMatch : state.matchesIndex[0].id;
         dom.matchSelect.value = initialMatchId;
 
-        await switchMatch(initialMatchId, false);
+        await switchMatch(initialMatchId, true);
       } catch (err) {
         console.error('Ошибка загрузки matches/index.json:', err);
       }
@@ -762,9 +767,7 @@
         syncUrlState();
 
         // Handle YouTube video load / switch
-        if (state.isPlayerReady && state.player) {
-          loadCurrentRallyVideo(autoPlayRally);
-        }
+        tryStartInitialPlayback(autoPlayRally);
       } catch (err) {
         console.error(`Ошибка загрузки матча matches/${matchId}.json:`, err);
       }
@@ -852,13 +855,20 @@
        ----------------------------------------------------------------------- */
 
     /**
-     * Global callback invoked automatically by YouTube IFrame API script
+     * Initializes YouTube Player instance
      */
-    window.onYouTubeIframeAPIReady = function() {
+    function initYouTubePlayer() {
+      if (state.player || !window.YT || !window.YT.Player) return;
+      const playerEl = document.getElementById('player');
+      if (!playerEl) return;
+
+      const targetVideoId = state.matchData?.videoId || 'dQw4w9WgXcQ';
+      state.currentLoadedVideoId = targetVideoId;
+
       state.player = new YT.Player('player', {
         height: '100%',
         width: '100%',
-        videoId: state.matchData?.videoId || 'dQw4w9WgXcQ',
+        videoId: targetVideoId,
         playerVars: {
           autoplay: 1,
           playsinline: 1,
@@ -874,6 +884,13 @@
           onError: onPlayerError
         }
       });
+    }
+
+    /**
+     * Global callback invoked automatically by YouTube IFrame API script
+     */
+    window.onYouTubeIframeAPIReady = function() {
+      initYouTubePlayer();
     };
 
     function onPlayerReady(event) {
@@ -886,10 +903,18 @@
       // Start continuous rally end detection timer (100ms)
       startRallyWatcher();
 
-      // If match data already loaded, play initial rally
-      if (state.filteredRallies.length > 0) {
-        loadCurrentRallyVideo(false);
+      // Trigger initial playback if match data is already available
+      tryStartInitialPlayback(true);
+    }
+
+    /**
+     * Coordinates playback startup once both matchData and YouTube Player are ready
+     */
+    function tryStartInitialPlayback(autoPlay = true) {
+      if (!state.isPlayerReady || !state.player || !state.matchData || state.filteredRallies.length === 0) {
+        return;
       }
+      loadCurrentRallyVideo(autoPlay);
     }
 
     function onPlayerStateChange(event) {
@@ -909,6 +934,28 @@
 
     function onPlayerError(event) {
       console.warn('YouTube Player Error:', event.data);
+    }
+
+    /**
+     * Checks if autoplay was blocked by the browser policy (e.g. mobile or strict policy)
+     * and shows a tap-to-play overlay if video is not playing within 900ms.
+     */
+    function checkAutoplayPolicy() {
+      if (state.autoplayTimer) clearTimeout(state.autoplayTimer);
+      state.autoplayTimer = setTimeout(() => {
+        try {
+          if (state.player && state.player.getPlayerState) {
+            const s = state.player.getPlayerState();
+            if (s !== YT.PlayerState.PLAYING && s !== YT.PlayerState.BUFFERING) {
+              showPlayOverlay();
+            }
+          }
+        } catch (e) {}
+      }, 900);
+    }
+
+    function showPlayOverlay() {
+      dom.playOverlay.classList.add('show');
     }
 
     /**
@@ -956,6 +1003,7 @@
 
         if (play) {
           state.player.playVideo();
+          checkAutoplayPolicy();
         } else {
           state.player.pauseVideo();
         }
