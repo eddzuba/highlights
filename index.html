@@ -62,7 +62,8 @@
         max-width: 680px;
       }
 
-      /* Unroll console so children participate in vertical flow */
+      /* Unroll containers so children participate in vertical flow */
+      .main-content,
       .control-console {
         display: contents;
       }
@@ -121,82 +122,121 @@
     }
 
     /* -----------------------------------------------------------------------
-       DESKTOP LAYOUT (Two Columns: Left = Control Console, Right = Video)
+       DESKTOP LAYOUT (Top Full-Width Header + Two Columns Below)
        ----------------------------------------------------------------------- */
     @media (min-width: 900px) {
       .app-container {
         max-width: 1540px;
-        padding: 20px 28px 40px;
+        padding: 16px 28px 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      /* Top Full-Width Header */
+      .console-header {
+        width: 100%;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius-lg);
+        padding: 14px 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      }
+
+      /* Two-Column Container below Header */
+      .main-content {
+        width: 100%;
         display: flex;
         flex-direction: row;
         align-items: flex-start;
-        gap: 24px;
+        gap: 20px;
       }
 
-      /* Left Column: Control Console */
+      /* Left Column: Narrow Filter Console (half of previous 360px = 180px) */
       .control-console {
-        width: 360px;
+        width: 180px;
         flex-shrink: 0;
         background: var(--card-bg);
         border: 1px solid var(--card-border);
         border-radius: var(--radius-lg);
-        padding: 22px 20px;
+        padding: 14px 12px;
         display: flex;
         flex-direction: column;
-        gap: 18px;
+        gap: 14px;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
         position: sticky;
         top: 20px;
       }
 
-      .console-header {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
       .console-filters {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
+      }
+
+      .control-console .select-label {
+        font-size: 0.68rem;
+      }
+
+      .control-console .custom-select-wrap select {
+        height: 38px;
+        padding: 0 26px 0 10px;
+        font-size: 0.8rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      .control-console .custom-select-wrap::after {
+        right: 10px;
       }
 
       .console-controls {
         display: flex;
         flex-direction: column;
-        gap: 14px;
+        gap: 12px;
       }
 
       .console-controls-row {
         display: flex;
         flex-direction: column;
-        gap: 14px;
+        gap: 12px;
       }
 
       .transport-buttons {
         width: 100%;
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
       }
 
       .transport-buttons .btn {
         width: 100%;
         min-width: 0;
+        height: 38px;
         padding: 0;
       }
 
       .speed-controls {
         width: 100%;
         display: flex;
-        align-items: center;
-        justify-content: space-between;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
       }
 
       .speed-chips-group {
-        display: flex;
-        align-items: center;
-        gap: 6px;
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+      }
+
+      .control-console .speed-chip {
+        height: 30px;
+        padding: 0 4px;
+        font-size: 0.74rem;
+        width: 100%;
       }
 
       .desktop-only-divider {
@@ -206,19 +246,19 @@
       }
 
       .desktop-shortcuts-hint {
-        font-size: 0.73rem;
+        font-size: 0.68rem;
         color: var(--text-muted);
-        line-height: 1.5;
+        line-height: 1.45;
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: var(--radius-sm);
-        padding: 8px 10px;
+        padding: 8px;
       }
 
       .desktop-shortcuts-hint kbd {
         display: inline-block;
-        padding: 1px 5px;
-        font-size: 0.7rem;
+        padding: 1px 4px;
+        font-size: 0.65rem;
         font-family: inherit;
         background: #252530;
         border: 1px solid #373748;
@@ -532,104 +572,95 @@
 <body>
 
   <div class="app-container">
-    <!-- Left Column on Desktop / Normal Flow on Mobile: Control Console -->
-    <aside class="control-console">
-      <!-- Header -->
-      <header class="console-header">
-        <div class="brand-bar">
-          <div class="logo-block">
-            <div class="logo-icon">🏐</div>
-            <div>
-              <h1 class="app-title">The Gardens Volleyball Highlights</h1>
-              <p class="app-subtitle">Персональный видеоплеер розыгрышей</p>
+    <!-- Top Full-Width Header -->
+    <header class="console-header">
+      <div class="brand-bar">
+        <div class="logo-block">
+          <div class="logo-icon">🏐</div>
+          <div>
+            <h1 class="app-title">The Gardens Volleyball Highlights</h1>
+            <p class="app-subtitle">Персональный видеоплеер розыгрышей</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Two-Column Content Area (Left = Narrow Filter, Right = Video) -->
+    <div class="main-content">
+      <!-- Left Column on Desktop / Normal Flow on Mobile: Control Console -->
+      <aside class="control-console">
+        <!-- Match and Player Selectors -->
+        <div class="console-filters">
+          <div class="select-group">
+            <label class="select-label" for="matchSelect">
+              <span>📅 Выбор матча</span>
+            </label>
+            <div class="custom-select-wrap">
+              <select id="matchSelect" aria-label="Выбор матча">
+                <option value="" disabled selected>Загрузка матчей...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="select-group">
+            <label class="select-label" for="playerSelect">
+              <span>👤 Фильтр игрока</span>
+            </label>
+            <div class="custom-select-wrap">
+              <select id="playerSelect" aria-label="Фильтр по игроку">
+                <option value="">Все игроки</option>
+              </select>
             </div>
           </div>
         </div>
-      </header>
 
-      <div class="desktop-only-divider"></div>
+        <div class="desktop-only-divider"></div>
 
-      <!-- Match and Player Selectors -->
-      <div class="console-filters">
-        <div class="select-group">
-          <label class="select-label" for="matchSelect">
-            <span>📅 Выбор матча</span>
-          </label>
-          <div class="custom-select-wrap">
-            <select id="matchSelect" aria-label="Выбор матча">
-              <option value="" disabled selected>Загрузка матчей...</option>
-            </select>
-          </div>
-        </div>
+        <!-- Controls & Speed Bar -->
+        <div class="console-controls">
+          <div class="console-controls-row">
+            <div class="transport-buttons">
+              <button id="prevBtn" class="btn btn-icon" title="Предыдущий розыгрыш" aria-label="Предыдущий розыгрыш">
+                ⏮
+              </button>
+              <button id="nextBtn" class="btn btn-icon" title="Следующий розыгрыш" aria-label="Следующий розыгрыш">
+                ⏭
+              </button>
+            </div>
 
-        <div class="select-group">
-          <label class="select-label" for="playerSelect">
-            <span>👤 Фильтр игрока</span>
-          </label>
-          <div class="custom-select-wrap">
-            <select id="playerSelect" aria-label="Фильтр по игроку">
-              <option value="">Все игроки</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="desktop-only-divider"></div>
-
-      <!-- Controls & Speed Bar -->
-      <div class="console-controls">
-        <div class="console-controls-row">
-          <div class="transport-buttons">
-            <button id="prevBtn" class="btn btn-icon" title="Предыдущий розыгрыш" aria-label="Предыдущий розыгрыш">
-              ⏮
-            </button>
-            <button id="replayBtn" class="btn btn-icon" title="Повторить розыгрыш" aria-label="Повторить розыгрыш">
-              ⟲
-            </button>
-            <button id="playPauseBtn" class="btn btn-icon btn-primary" title="Воспроизведение/Пауза" aria-label="Пауза">
-              ⏸
-            </button>
-            <button id="nextBtn" class="btn btn-icon" title="Следующий розыгрыш" aria-label="Следующий розыгрыш">
-              ⏭
-            </button>
-            <button id="fullscreenBtn" class="btn btn-icon" title="Во весь экран (F)" aria-label="Во весь экран">
-              ⛶
-            </button>
-          </div>
-
-          <div class="speed-controls">
-            <span class="speed-label">Скорость:</span>
-            <div class="speed-chips-group">
-              <button class="speed-chip" data-rate="0.5">0.5x</button>
-              <button class="speed-chip" data-rate="0.75">0.75x</button>
-              <button class="speed-chip active" data-rate="1">1x</button>
+            <div class="speed-controls">
+              <span class="speed-label">Скорость:</span>
+              <div class="speed-chips-group">
+                <button class="speed-chip" data-rate="0.5">0.5x</button>
+                <button class="speed-chip" data-rate="0.75">0.75x</button>
+                <button class="speed-chip active" data-rate="1">1x</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="desktop-shortcuts-hint">
-        💡 <b>Горячие клавиши:</b><br>
-        <kbd>Пробел</kbd> — пауза / плей<br>
-        <kbd>←</kbd> / <kbd>→</kbd> — розыгрыши<br>
-        <kbd>R</kbd> — повторить текущий<br>
-        <kbd>F</kbd> — во весь экран
-      </div>
-    </aside>
+        <div class="desktop-shortcuts-hint">
+          💡 <b>Клавиши:</b><br>
+          <kbd>Пробел</kbd> — пауза/плей<br>
+          <kbd>←</kbd> / <kbd>→</kbd> — розыгрыши<br>
+          <kbd>F</kbd> — во весь экран
+        </div>
+      </aside>
 
-    <!-- Right Column on Desktop / In-flow on Mobile: Full-Space Video -->
-    <main class="video-panel">
-      <div class="player-card">
-        <div class="video-wrapper" id="videoWrapper">
-          <div id="player"></div>
-          <div id="videoClickLayer" class="video-click-layer" title="Пауза / Плей (двойной клик — во весь экран)"></div>
-          <div id="playOverlay" class="play-overlay">
-            <div class="play-big-btn">▶</div>
-            <div class="play-hint-text">Нажмите для воспроизведения розыгрыша</div>
+      <!-- Right Column on Desktop / In-flow on Mobile: Full-Space Video -->
+      <main class="video-panel">
+        <div class="player-card">
+          <div class="video-wrapper" id="videoWrapper">
+            <div id="player"></div>
+            <div id="videoClickLayer" class="video-click-layer" title="Пауза / Плей (двойной клик — во весь экран)"></div>
+            <div id="playOverlay" class="play-overlay">
+              <div class="play-big-btn">▶</div>
+              <div class="play-hint-text">Нажмите для воспроизведения розыгрыша</div>
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
 
   <!-- YouTube IFrame API Script -->
@@ -1122,16 +1153,16 @@
       });
 
       // Previous button
-      dom.prevBtn.addEventListener('click', prevRally);
+      if (dom.prevBtn) dom.prevBtn.addEventListener('click', prevRally);
 
       // Replay button
-      dom.replayBtn.addEventListener('click', replayRally);
+      if (dom.replayBtn) dom.replayBtn.addEventListener('click', replayRally);
 
       // Play/Pause button
-      dom.playPauseBtn.addEventListener('click', togglePlayPause);
+      if (dom.playPauseBtn) dom.playPauseBtn.addEventListener('click', togglePlayPause);
 
       // Next button
-      dom.nextBtn.addEventListener('click', nextRally);
+      if (dom.nextBtn) dom.nextBtn.addEventListener('click', nextRally);
 
       // Speed chips
       dom.speedChips.forEach(chip => {
@@ -1240,6 +1271,7 @@
     }
 
     function updatePlayPauseBtnState(isPlaying) {
+      if (!dom.playPauseBtn) return;
       if (isPlaying) {
         dom.playPauseBtn.textContent = '⏸';
         dom.playPauseBtn.title = 'Пауза';
