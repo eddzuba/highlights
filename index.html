@@ -624,6 +624,7 @@
       player: null,           // YT.Player instance
       isPlayerReady: false,
       isPlaying: false,
+      currentLoadedVideoId: null,
       playbackRate: 1.0,
       pollTimer: null,
       isTransitioning: false
@@ -832,12 +833,18 @@
     function selectRallyByIndex(idx, playImmediately = true) {
       if (idx < 0 || idx >= state.filteredRallies.length) return;
       state.currentRallyIndex = idx;
+      state.isTransitioning = true;
 
       syncUrlState();
 
       if (state.isPlayerReady && state.player) {
         loadCurrentRallyVideo(playImmediately);
       }
+
+      // Clear transitioning flag after seek settles (300ms)
+      setTimeout(() => {
+        state.isTransitioning = false;
+      }, 300);
     }
 
     /* -----------------------------------------------------------------------
@@ -871,11 +878,12 @@
 
     function onPlayerReady(event) {
       state.isPlayerReady = true;
+      state.currentLoadedVideoId = state.matchData?.videoId || 'dQw4w9WgXcQ';
       if (state.playbackRate !== 1.0) {
         state.player.setPlaybackRate(state.playbackRate);
       }
 
-      // Start continuous rally end detection timer (200ms)
+      // Start continuous rally end detection timer (100ms)
       startRallyWatcher();
 
       // If match data already loaded, play initial rally
@@ -904,7 +912,9 @@
     }
 
     /**
-     * Loads current rally into the player
+     * Loads current rally into the player smoothly.
+     * When switching within the same match, uses seekTo for instant, smooth playback
+     * without resetting the scrubber to 0:00 or reloading the player stream.
      * @param {boolean} play
      */
     function loadCurrentRallyVideo(play = true) {
@@ -913,14 +923,32 @@
       const rally = state.filteredRallies[state.currentRallyIndex];
       if (!rally) return;
 
-      state.isTransitioning = false;
+      const targetVideoId = state.matchData.videoId;
+      if (!targetVideoId) {
+        state.isTransitioning = false;
+        return;
+      }
 
       try {
-        state.player.loadVideoById({
-          videoId: state.matchData.videoId,
-          startSeconds: rally.start,
-          endSeconds: rally.end
-        });
+        let currentIframeVideoId = state.currentLoadedVideoId;
+        try {
+          if (state.player.getVideoData && state.player.getVideoData().video_id) {
+            currentIframeVideoId = state.player.getVideoData().video_id;
+          }
+        } catch (e) {}
+
+        if (currentIframeVideoId !== targetVideoId) {
+          // Different video ID -> full load
+          state.currentLoadedVideoId = targetVideoId;
+          state.player.loadVideoById({
+            videoId: targetVideoId,
+            startSeconds: rally.start
+          });
+        } else {
+          // SAME VIDEO -> SMOOTH INSTANT JUMP TO RALLY START!
+          // No reload, no jerk, no jump to 0:00!
+          state.player.seekTo(rally.start, true);
+        }
 
         if (state.playbackRate !== 1.0) {
           state.player.setPlaybackRate(state.playbackRate);
@@ -928,14 +956,16 @@
 
         if (play) {
           state.player.playVideo();
+        } else {
+          state.player.pauseVideo();
         }
       } catch (err) {
-        console.warn('Error loading video by ID:', err);
+        console.warn('Error playing rally video:', err);
       }
     }
 
     /**
-     * Continuous 200ms polling to reliably detect rally end
+     * Continuous 100ms polling to reliably detect rally end
      */
     function startRallyWatcher() {
       if (state.pollTimer) clearInterval(state.pollTimer);
@@ -949,13 +979,13 @@
         try {
           const currentTime = state.player.getCurrentTime();
           // If playback crossed rally.end
-          if (typeof currentTime === 'number' && currentTime >= rally.end - 0.25) {
+          if (typeof currentTime === 'number' && currentTime >= rally.end - 0.2) {
             handleRallyFinished();
           }
         } catch (e) {
           // Player might be switching or initializing
         }
-      }, 200);
+      }, 100);
     }
 
     /**
@@ -1053,12 +1083,7 @@
 
     function replayRally() {
       if (state.filteredRallies.length === 0) return;
-      const rally = state.filteredRallies[state.currentRallyIndex];
-      if (rally && state.player && state.player.seekTo) {
-        state.isTransitioning = false;
-        state.player.seekTo(rally.start, true);
-        state.player.playVideo();
-      }
+      selectRallyByIndex(state.currentRallyIndex, true);
     }
 
     function nextRally() {
