@@ -176,7 +176,7 @@
       .transport-buttons {
         width: 100%;
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
         gap: 8px;
       }
 
@@ -352,6 +352,7 @@
       width: 100%;
       padding-top: 56.25%; /* 16:9 Aspect Ratio */
       background: #000;
+      overflow: hidden;
     }
 
     .video-wrapper:fullscreen {
@@ -361,6 +362,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
     }
 
     .video-click-layer {
@@ -375,30 +377,12 @@
 
     #player {
       position: absolute;
-      top: 0;
+      top: -65px;
       left: 0;
       width: 100%;
-      height: 100%;
+      height: calc(100% + 130px);
       border: 0;
       pointer-events: none;
-    }
-
-    .transition-curtain {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #0a0a0f;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 6;
-      transition: opacity 0.15s ease-out;
-    }
-
-    .transition-curtain.active {
-      opacity: 1;
-      transition: opacity 0.08s ease-in;
     }
 
     /* Transport Buttons */
@@ -638,7 +622,6 @@
       <div class="player-card">
         <div class="video-wrapper" id="videoWrapper">
           <div id="player"></div>
-          <div id="transitionCurtain" class="transition-curtain"></div>
           <div id="videoClickLayer" class="video-click-layer" title="Пауза / Плей (двойной клик — во весь экран)"></div>
           <div id="playOverlay" class="play-overlay">
             <div class="play-big-btn">▶</div>
@@ -686,7 +669,6 @@
       fullscreenBtn: document.getElementById('fullscreenBtn'),
       speedChips: document.querySelectorAll('.speed-chip'),
       playOverlay: document.getElementById('playOverlay'),
-      transitionCurtain: document.getElementById('transitionCurtain'),
       videoWrapper: document.getElementById('videoWrapper'),
       videoClickLayer: document.getElementById('videoClickLayer')
     };
@@ -888,22 +870,14 @@
 
       syncUrlState();
 
-      // Show smooth quick transition curtain to mask YouTube's internal seekTo bezel / title flash
-      if (dom.transitionCurtain && playImmediately) {
-        dom.transitionCurtain.classList.add('active');
-      }
-
       if (state.isPlayerReady && state.player) {
         loadCurrentRallyVideo(playImmediately);
       }
 
-      // Fade out transition curtain once seek settles and playback resumes
+      // Clear transitioning flag after seek settles (350ms)
       setTimeout(() => {
-        if (dom.transitionCurtain) {
-          dom.transitionCurtain.classList.remove('active');
-        }
         state.isTransitioning = false;
-      }, 320);
+      }, 350);
     }
 
     /* -----------------------------------------------------------------------
@@ -930,7 +904,7 @@
           playsinline: 1,
           rel: 0,
           modestbranding: 1,
-          controls: 0,
+          controls: 1,
           disablekb: 1,
           fs: 0,
           iv_load_policy: 3
@@ -985,9 +959,6 @@
       } else if (event.data === YT.PlayerState.PAUSED) {
         state.isPlaying = false;
         updatePlayPauseBtnState(false);
-        if (!state.isTransitioning) {
-          showPlayOverlay();
-        }
       } else if (event.data === YT.PlayerState.ENDED) {
         state.isPlaying = false;
         updatePlayPauseBtnState(false);
@@ -1065,9 +1036,7 @@
         }
 
         if (play) {
-          if (!state.isPlaying) {
-            state.player.playVideo();
-          }
+          state.player.playVideo();
         } else {
           state.player.pauseVideo();
         }
@@ -1090,8 +1059,8 @@
 
         try {
           const currentTime = state.player.getCurrentTime();
-          // If playback crossed rally.end
-          if (typeof currentTime === 'number' && currentTime >= rally.end - 0.2) {
+          // If playback crossed rally.end (and isn't a stale pre-seek timestamp far ahead)
+          if (typeof currentTime === 'number' && currentTime >= rally.end - 0.15 && currentTime <= rally.end + 3.0) {
             handleRallyFinished();
           }
         } catch (e) {
@@ -1105,15 +1074,28 @@
      */
     function handleRallyFinished() {
       if (state.isTransitioning) return;
-      state.isTransitioning = true;
 
-      // Auto-transition to next rally
-      if (state.currentRallyIndex + 1 < state.filteredRallies.length) {
-        selectRallyByIndex(state.currentRallyIndex + 1, true);
-      } else {
-        // Loop back to first rally or pause at finish
-        selectRallyByIndex(0, true);
+      const currentRally = state.filteredRallies[state.currentRallyIndex];
+      const nextIndex = (state.currentRallyIndex + 1 < state.filteredRallies.length)
+        ? state.currentRallyIndex + 1
+        : 0;
+      const nextRally = state.filteredRallies[nextIndex];
+
+      // If next rally is contiguous in the video stream (e.g. next.start == current.end),
+      // advance index seamlessly without calling seekTo!
+      if (
+        currentRally &&
+        nextRally &&
+        nextIndex > state.currentRallyIndex &&
+        Math.abs(nextRally.start - currentRally.end) <= 0.5
+      ) {
+        state.currentRallyIndex = nextIndex;
+        syncUrlState();
+        return;
       }
+
+      state.isTransitioning = true;
+      selectRallyByIndex(nextIndex, true);
     }
 
     /* -----------------------------------------------------------------------
