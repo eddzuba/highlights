@@ -354,6 +354,25 @@
       background: #000;
     }
 
+    .video-wrapper:fullscreen {
+      width: 100vw;
+      height: 100vh;
+      padding-top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-click-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+      cursor: pointer;
+    }
+
     #player {
       position: absolute;
       top: 0;
@@ -570,6 +589,9 @@
             <button id="nextBtn" class="btn btn-icon" title="Следующий розыгрыш" aria-label="Следующий розыгрыш">
               ⏭
             </button>
+            <button id="fullscreenBtn" class="btn btn-icon" title="Во весь экран (F)" aria-label="Во весь экран">
+              ⛶
+            </button>
           </div>
 
           <div class="speed-controls">
@@ -587,15 +609,17 @@
         💡 <b>Горячие клавиши:</b><br>
         <kbd>Пробел</kbd> — пауза / плей<br>
         <kbd>←</kbd> / <kbd>→</kbd> — розыгрыши<br>
-        <kbd>R</kbd> — повторить текущий
+        <kbd>R</kbd> — повторить текущий<br>
+        <kbd>F</kbd> — во весь экран
       </div>
     </aside>
 
     <!-- Right Column on Desktop / In-flow on Mobile: Full-Space Video -->
     <main class="video-panel">
       <div class="player-card">
-        <div class="video-wrapper">
+        <div class="video-wrapper" id="videoWrapper">
           <div id="player"></div>
+          <div id="videoClickLayer" class="video-click-layer" title="Пауза / Плей (двойной клик — во весь экран)"></div>
           <div id="playOverlay" class="play-overlay">
             <div class="play-big-btn">▶</div>
             <div class="play-hint-text">Нажмите для воспроизведения розыгрыша</div>
@@ -639,8 +663,11 @@
       replayBtn: document.getElementById('replayBtn'),
       playPauseBtn: document.getElementById('playPauseBtn'),
       nextBtn: document.getElementById('nextBtn'),
+      fullscreenBtn: document.getElementById('fullscreenBtn'),
       speedChips: document.querySelectorAll('.speed-chip'),
-      playOverlay: document.getElementById('playOverlay')
+      playOverlay: document.getElementById('playOverlay'),
+      videoWrapper: document.getElementById('videoWrapper'),
+      videoClickLayer: document.getElementById('videoClickLayer')
     };
 
     /* -----------------------------------------------------------------------
@@ -874,8 +901,9 @@
           playsinline: 1,
           rel: 0,
           modestbranding: 1,
-          controls: 1,
-          fs: 1,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
           iv_load_policy: 3
         },
         events: {
@@ -1103,12 +1131,37 @@
         }
       });
 
+      // Video click to toggle play/pause, double click for fullscreen
+      let clickTimer = null;
+      if (dom.videoClickLayer) {
+        dom.videoClickLayer.addEventListener('click', () => {
+          if (clickTimer) {
+            clearTimeout(clickTimer);
+            clickTimer = null;
+            toggleFullscreen();
+          } else {
+            clickTimer = setTimeout(() => {
+              clickTimer = null;
+              togglePlayPause();
+            }, 240);
+          }
+        });
+      }
+
+      // Fullscreen button click
+      if (dom.fullscreenBtn) {
+        dom.fullscreenBtn.addEventListener('click', toggleFullscreen);
+      }
+
       // Keyboard shortcuts for convenience
       document.addEventListener('keydown', (e) => {
         if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;
         if (e.code === 'Space') {
           e.preventDefault();
           togglePlayPause();
+        } else if (e.code === 'KeyF') {
+          e.preventDefault();
+          toggleFullscreen();
         } else if (e.code === 'ArrowRight') {
           e.preventDefault();
           nextRally();
@@ -1120,6 +1173,24 @@
           replayRally();
         }
       });
+    }
+
+    function toggleFullscreen() {
+      const el = dom.videoWrapper;
+      if (!el) return;
+      if (!document.fullscreenElement) {
+        if (el.requestFullscreen) {
+          el.requestFullscreen();
+        } else if (el.webkitRequestFullscreen) {
+          el.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
     }
 
     function prevRally() {
